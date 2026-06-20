@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FileDrop from "@/components/FileDrop";
 import DiffView from "@/components/DiffView";
 import { buildDiff, type DiffStats } from "@/lib/diff";
@@ -21,6 +21,28 @@ function flavor(stats: DiffStats): string {
 export default function Home() {
   const [left, setLeft] = useState<Doc | null>(null);
   const [right, setRight] = useState<Doc | null>(null);
+
+  // URL クエリ (?left=/path/a.md&right=/path/b.md) で渡されたファイルを自動表示。
+  // Claude がファイルを書いて mdiff を開くだけで差分が出る、という動線のため。
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const leftPath = sp.get("left") ?? sp.get("a");
+    const rightPath = sp.get("right") ?? sp.get("b");
+
+    const load = async (path: string, set: (doc: Doc) => void) => {
+      try {
+        const res = await fetch(`/api/source?path=${encodeURIComponent(path)}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as Doc;
+        set({ name: data.name, content: data.content });
+      } catch {
+        /* ローカル読み込み失敗時は手動アップロードにフォールバック */
+      }
+    };
+
+    if (leftPath) load(leftPath, setLeft);
+    if (rightPath) load(rightPath, setRight);
+  }, []);
 
   const result = useMemo(() => {
     if (!left || !right) return null;
