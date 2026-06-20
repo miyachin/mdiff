@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* ライトモード固定: dark: は OS 設定ではなく .dark クラス付与時のみ有効 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,15 +15,23 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 隠し味: タイトル末尾の点滅カーソル */
+@keyframes mdiff-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+.mdiff-caret {
+  animation: mdiff-blink 1.15s step-end infinite;
 }

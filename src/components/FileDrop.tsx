@@ -45,9 +45,13 @@ export default function FileDrop({ label, fileName, onLoad }: Props) {
         <span className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
           📄 {fileName}
         </span>
+      ) : dragOver ? (
+        <span className="text-sm font-medium text-blue-500">
+          Drop it like it&apos;s hot 🔥
+        </span>
       ) : (
         <span className="text-sm text-neutral-400">
-          クリック or ドロップして .md を選択
+          クリック、または .md をここへ
         </span>
       )}
       <input
